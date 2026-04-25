@@ -136,9 +136,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     # region add_argument
-    parser.add_argument('--task_name', type=str, default='t1ce_label3_4clients')
+    parser.add_argument('--task_name', type=str, default='task_name')
     parser.add_argument('--work_dir', type=str, default='./work_dir/fl_train')
-    parser.add_argument('--num_clients', type=int, default=4, help="Total number of clients")
+    parser.add_argument('--num_clients', type=int, default=3, help="Total number of clients")
     parser.add_argument('--join_ratio', type=float, default=1.0, help="Ratio of clients per round")
     parser.add_argument('--batch_size', type=int, default=1)
     parser.add_argument('--lr', type=float, default=8e-4)
