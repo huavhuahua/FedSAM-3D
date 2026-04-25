@@ -29,9 +29,9 @@ click_methods = {
 class clientALA(object):
     def __init__(self, args, cid):
         self.args = args
-        self.model = copy.deepcopy(args.model)     # arg.model在main.py中定义，为初始化的模型FedAvgCNN对象
-        self.dataset = img_datas                   # arg.dataset在serverALA.py中定义，由data_utils.py中的read_client_data返回数据对
-        self.device = args.device                  # 这里是统一的，后面要改
+        self.model = copy.deepcopy(args.model)     
+        self.dataset = img_datas                   
+        self.device = args.device                  
         self.cid = cid
         self.loss = nn.CrossEntropyLoss()
         self.batch_size = args.batch_size
@@ -249,10 +249,10 @@ class clientALA(object):
             masks=low_res_masks,
         )
         low_res_masks, iou_predictions = sam_model.mask_decoder(
-            image_embeddings=image_embedding.to(self.device), # (B, 256, 64, 64)
-            image_pe=sam_model.prompt_encoder.get_dense_pe(), # (1, 256, 64, 64)
-            sparse_prompt_embeddings=sparse_embeddings, # (B, 2, 256)
-            dense_prompt_embeddings=dense_embeddings, # (B, 256, 64, 64)
+            image_embeddings=image_embedding.to(self.device), 
+            image_pe=sam_model.prompt_encoder.get_dense_pe(), 
+            sparse_prompt_embeddings=sparse_embeddings, 
+            dense_prompt_embeddings=dense_embeddings, 
             multimask_output=False,
         )
         prev_masks = F.interpolate(low_res_masks, size=gt3D.shape[-3:], mode='trilinear', align_corners=False)
@@ -297,6 +297,6 @@ class clientALA(object):
         return (sum(dice_list)/len(dice_list)).item() 
 
 
-    def local_initialization(self, args, received_global_model):     # serverALA.py中send_models中调用
+    def local_initialization(self, args, received_global_model):     
         self.ALA.adaptive_local_aggregation(args, received_global_model, self.model)
 
