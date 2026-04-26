@@ -196,14 +196,14 @@ class TwoWayAttentionBlock3D(nn.Module):
         attn_out = self.cross_attn_token_to_image(q=q, k=k, v=keys)
         queries = queries + attn_out
         
-        """-----here-----"""
+        """-----add adapter here-----"""
         queries = self.adapter1(queries)
         queries = self.norm2(queries)
 
         # MLP block
         mlp_out = self.mlp(queries)
         queries = queries + mlp_out
-        """-----here-----"""
+        """-----add adapter here-----"""
         queries = self.adapter2(queries)
         queries = self.norm3(queries)
 
@@ -212,7 +212,7 @@ class TwoWayAttentionBlock3D(nn.Module):
         k = keys + key_pe
         attn_out = self.cross_attn_image_to_token(q=k, k=q, v=queries)
         keys = keys + attn_out
-        """-----here-----"""
+        """-----add adapter here-----"""
         queries = self.adapter3(queries)
         keys = self.norm4(keys)
 
@@ -427,7 +427,7 @@ class MaskDecoder3D(nn.Module):
         hs, src = self.transformer(src, pos_src, tokens)
         iou_token_out = hs[:, 0, :]
         mask_tokens_out = hs[:, 1 : (1 + self.num_mask_tokens), :]
-        """-----here-----"""
+        """-----add adapter here-----"""
         mask_tokens_out = self.adapter_mask_tokens(mask_tokens_out)
 
         # Upscale mask embeddings and predict masks using the mask tokens
