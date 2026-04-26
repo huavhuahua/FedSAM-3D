@@ -9,7 +9,7 @@ from torch.utils.data.distributed import DistributedSampler
 import SimpleITK as sitk
 from prefetch_generator import BackgroundGenerator
 from utils.data_paths import img_datas
-from transform_crop import CropOrPadWithRestore
+from utils.transform_crop import CropOrPadWithRestore
 
 def get_dataloaders(args, cid):
     train_dataset = Dataset_Union_ALL(args, paths=img_datas[cid], transform=tio.Compose([
