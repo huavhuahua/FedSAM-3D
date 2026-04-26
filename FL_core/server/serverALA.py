@@ -29,7 +29,7 @@ class FedALA(object):
             self.send_models(args)   
             
 
-            for client in self.selected_clients:    # 每个客户端模型进行训练
+            for client in self.selected_clients:    
                 client.train(i)
 
                 self.receive_models()
@@ -78,26 +78,28 @@ class FedALA(object):
 
         active_train_samples = 0
         for client in self.selected_clients:
-            active_train_samples += client.c_weight   # train数据量
+            active_train_samples += client.c_weight   
 
         self.uploaded_weights = []
         self.uploaded_ids = []
         self.uploaded_models = []
+        
         for client in self.selected_clients:
-            self.uploaded_weights.append(client.c_weight / active_train_samples)   # 以客户端数据量作为权重
-            self.uploaded_ids.append(client.cid)   # 客户端编号
-            self.uploaded_models.append(client.model)    # 客户端模型
+            self.uploaded_weights.append(client.c_weight / active_train_samples) 
+            self.uploaded_ids.append(client.cid)   
+            self.uploaded_models.append(client.model)    
 
-    def add_parameters(self, w, client_model):   # 全局模型是客户端模型的加权聚合
+    def add_parameters(self, w, client_model):   
         for server_param, client_param in zip(self.global_model.parameters(), client_model.parameters()):
             server_param.data += client_param.data.clone() * w
 
+    # Parameter aggregation weighted by data volume
     def aggregate_parameters(self):
         assert (len(self.uploaded_models) > 0)
 
         self.global_model = copy.deepcopy(self.uploaded_models[0])
         for param in self.global_model.parameters():
-            param.data = torch.zeros_like(param.data)  # 初始化一个全0的和客户端模型结构一致的全局模型
+            param.data = torch.zeros_like(param.data) 
             
         for w, client_model in zip(self.uploaded_weights, self.uploaded_models):
             self.add_parameters(w, client_model)
