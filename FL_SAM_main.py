@@ -15,8 +15,6 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
 
-# region add_argument
-# endregion
 
 def main(args):
     time_list = []
@@ -31,9 +29,9 @@ def main(args):
             args=(args, )   
         )
     else:
-        random.seed(2023)
-        np.random.seed(2023)
-        torch.manual_seed(2023)
+        random.seed(111)
+        np.random.seed(111)
+        torch.manual_seed(111)
 
         # region prepare model
         args.model = build_model_adapter(args)
@@ -48,18 +46,14 @@ def main(args):
 
     print("All done!")
 
-
-# region build_model
 def build_model_adapter(args):
     sam_model = sam_model_registry3D[args.model_type](checkpoint=None).to(args.device)
     sam_model = freeze_control(args, sam_model)
     if args.multi_gpu:
         sam_model = DDP(sam_model, device_ids=[args.rank], output_device=args.rank)
     return sam_model
-# endregion
 
 
-# region main_worker()
 def main_worker(rank, args):
     setup(rank, args.world_size)
 
@@ -77,14 +71,6 @@ def main_worker(rank, args):
         level=logging.INFO if rank in [-1, 0] else logging.WARN,
         filemode='w',
         filename=os.path.join(LOG_OUT_DIR, f'output_{cur_time}.log'))
-    
-
-    # Training
-    # dataloaders = get_dataloaders(args)
-    # model = build_model_adapter(args)
-    # trainer = BaseTrainer(model, dataloaders, args)
-    # trainer.train()
-
     cleanup()
 
 def setup(rank, world_size):
@@ -110,8 +96,6 @@ def init_seeds(seed=0, cuda_deterministic=True):
 
 def cleanup():
     dist.destroy_process_group()
-# endregion
-    
         
 def device_config(args):
     try:
@@ -135,7 +119,6 @@ if __name__ == "__main__":
     total_start = time.time()
 
     parser = argparse.ArgumentParser()
-    # region add_argument
     parser.add_argument('--task_name', type=str, default='task_name')
     parser.add_argument('--work_dir', type=str, default='./work_dir/fl_train')
     parser.add_argument('--num_clients', type=int, default=3, help="Total number of clients")
@@ -166,7 +149,6 @@ if __name__ == "__main__":
     parser.add_argument('-prev', type=int, default=0, help="Previous Running times")
     parser.add_argument('--click_type', type=str, default='random')
     parser.add_argument('--multi_click', action='store_true', default=False)
-    # endregion
     args = parser.parse_args()
 
     if args.device == "cuda" and not torch.cuda.is_available():
