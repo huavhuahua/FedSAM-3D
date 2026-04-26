@@ -86,9 +86,6 @@ class Dataset_Union_ALL(Dataset):
         if self.transform:
             try:
                 subject = self.transform(subject)
-                # tio.ScalarImage(tensor=subject.image.data).save(f"AAAsomething_check/transformed_image_{index}.nii.gz")
-                # tio.LabelMap(tensor=subject.label.data).save(f"AAAsomething_check/transformed_label_{index}.nii.gz")
-
             except:
                 print(self.image_paths[index])
 
@@ -100,9 +97,7 @@ class Dataset_Union_ALL(Dataset):
             random_index = torch.argwhere(subject.label.data == 1)
             if(len(random_index)>=1):
                 random_index = random_index[np.random.randint(0, len(random_index))]
-                # print(random_index)
                 crop_mask = torch.zeros_like(subject.label.data)
-                # print(crop_mask.shape)
                 crop_mask[random_index[0]][random_index[1]][random_index[2]][random_index[3]] = 1
                 subject.add_image(tio.LabelMap(tensor=crop_mask,
                                                 affine=subject.label.affine),
