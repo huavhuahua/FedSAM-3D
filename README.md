@@ -37,12 +37,12 @@ The overall workflow of this project consists of three main stages:
    ├── train/
    │   ├── imagesTr/
    │   └── labelsTr/
-   ├── test/1/1/
+   ├── test/
    │   ├── imagesTs/
    │   └── labelsTs/
    ```
 
-3. **Model training**  
+2. **Model training**  
    The model can be trained using:
    
    ```bash
@@ -65,7 +65,7 @@ The overall workflow of this project consists of three main stages:
 
 If you find this work useful, please consider citing:
 
-```bash
+```bibtex
 @article{wu2026fedsam3d,
   title={FedSAM-3D: A Federated Adapter-based Approach Dedicated to Enhance the Transferability of Medical Segmentation Foundation Models},
   author={Xinran Wu and Rencheng Zheng and Yuxiang Dai and Hui Zhang and Xueqin Xia and Yu Cheng and Chengyan Wang and He Wang},
