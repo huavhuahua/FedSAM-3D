@@ -58,7 +58,7 @@ sam_model_registry3D = {
     "vit_h": build_sam3D_vit_h,
     "vit_l": build_sam3D_vit_l,
     "vit_b": build_sam3D_vit_b,
-    "vit_b_ori": build_sam3D_vit_b_ori,    # arg default
+    "vit_b_ori": build_sam3D_vit_b_ori,   
 }
 
 
@@ -71,7 +71,7 @@ def _build_sam3D(
     checkpoint=None,
 ):
     prompt_embed_dim = 384
-    image_size = 256    # _build_sam3D中为128
+    image_size = 256    
     vit_patch_size = 16
     image_embedding_size = image_size // vit_patch_size
     sam = Sam3D(
