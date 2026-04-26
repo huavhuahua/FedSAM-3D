@@ -10,8 +10,6 @@ from torch import nn
 
 from typing import Any, Optional, Tuple, Type
 
-from .common import Adapter
-
 
 class LayerNorm3d(nn.Module):
     def __init__(self, num_channels: int, eps: float = 1e-6) -> None:
@@ -73,9 +71,6 @@ class PromptEncoder3D(nn.Module):
             nn.Conv3d(mask_in_chans, embed_dim, kernel_size=1),
         )
         self.no_mask_embed = nn.Embedding(1, embed_dim)
-
-        # self.adapter_dense = Adapter(8)
-        # self.adapter_sparse = Adapter(embed_dim)
 
     def get_dense_pe(self) -> torch.Tensor:
         """
@@ -182,13 +177,6 @@ class PromptEncoder3D(nn.Module):
             dense_embeddings = self.no_mask_embed.weight.reshape(1, -1, 1, 1, 1).expand(
                 bs, -1, self.image_embedding_size[0], self.image_embedding_size[1], self.image_embedding_size[2]
             )
-
-        """------here-----"""
-        # print('dense_embeddings & sparse_embeddings',
-        #        dense_embeddings.size(), dense_embeddings.max(), dense_embeddings.min(), 
-        #        sparse_embeddings.size(), sparse_embeddings.max(), sparse_embeddings.min())
-        # dense_embeddings = self.adapter_dense(dense_embeddings)
-        # sparse_embeddings = self.adapter_sparse(sparse_embeddings)
 
         return sparse_embeddings, dense_embeddings
 
