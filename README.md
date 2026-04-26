@@ -18,9 +18,58 @@ pip install -r requirements.txt
 The code has been tested on Linux with NVIDIA GPUs.
 
 ## 📁 Repository Structure
-- `FL_core/`               Client and server training process 
+- `FL_core/`               Federated learning process (client and server)  
 - `sam_ckpt/`              Pretrained model weights  
-- `segment_anything/`      Model definitions (SAM-Med3D and adapters) 
-- `utils/`    Evaluation and metric computation  
-- `configs/`       Configuration files for experiments  
-- `utils/`         Utility functions  
+- `segment_anything/`      Model definitions (SAM-Med3D and adapters)  
+- `utils/`                 Data preparation and utility functions  
+- `FL_SAM_main.py`         Main training script  
+- `validation.py`          Evaluation script  
+- `requirements.txt`       Dependency list
+
+## 🚀 Usage
+
+The overall workflow of this project consists of three main stages:
+
+1. **Data preparation**  
+   Organize the datasets into the required format and perform preprocessing if needed.
+   ```bash
+   dataset/
+   ├── train/
+   │   ├── imagesTr/
+   │   └── labelsTr/
+   ├── test/1/1/
+   │   ├── imagesTs/
+   │   └── labelsTs/
+   ```
+
+3. **Model training**  
+   The model can be trained using:
+   
+   ```bash
+   python FL_SAM_main.py
+   ```
+
+3. **Evaluation**  
+   After training, the model can be evaluated using:
+   ```bash
+   python validation.py
+   ```
+## 🧩 Notes
+
+- This repository provides a reference implementation of the proposed framework.  
+- Due to data security constraints, the datasets used in this study are not publicly available.  
+- The provided scripts and configurations are intended to illustrate the overall workflow.  
+- Full reproduction of the reported results may require access to the original datasets and specific experimental settings.
+
+## 📜 Citation
+
+If you find this work useful, please consider citing:
+
+```bash
+@article{wu2026fedsam3d,
+  title={FedSAM-3D: A Federated Adapter-based Approach Dedicated to Enhance the Transferability of Medical Segmentation Foundation Models},
+  author={Xinran Wu and Rencheng Zheng and Yuxiang Dai and Hui Zhang and Xueqin Xia and Yu Cheng and Chengyan Wang and He Wang},
+  journal={Under Review},
+  year={2026}
+}
+```
