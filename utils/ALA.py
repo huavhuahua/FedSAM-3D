@@ -60,7 +60,6 @@ class ALA:
         self.weight = 0.4
         self.norm_transform = tio.ZNormalization(masking_method=lambda x: x > 0)
 
-# region train func
     def batch_forward(self, sam_model, image_embedding, gt3D, low_res_masks, points=None):
         
         sparse_embeddings, dense_embeddings = sam_model.prompt_encoder(
@@ -135,7 +134,6 @@ class ALA:
             self.lr_scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(self.optimizer)
         else:
             self.lr_scheduler = torch.optim.lr_scheduler.LinearLR(self.optimizer, 0.1)
-# endregion
 
     def adaptive_local_aggregation(self, args,
                             global_model: nn.Module,
@@ -151,11 +149,7 @@ class ALA:
         Returns:
             None.
         """
-
-        # local training data
-        # dataloader = get_dataloaders(args, self.cid)
-        # sub_dataloader = create_subset_dataloader(dataloader, sub_size[self.cid])
-        
+      
         # obtain the references of the parameters
         params_g = list(global_model.parameters())
         params = list(local_model.parameters())
