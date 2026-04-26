@@ -23,24 +23,15 @@ from transform_crop import CropOrPadWithRestore
 import time
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('--addname', type=str, default='_pancreas')
-# parser.add_argument('-tdp', '--test_data_path', type=str, default='/home1/HWGroup/xrwu/Data/Proj1/ABDOMEN-dataset/ct_AMOS/test')
-# parser.add_argument('-vp', '--vis_path', type=str, default='/home1/HWGroup/xrwu/Data/Proj1/test_results/ct_AMOS_pancreas/results_flavg_correct')
-# parser.add_argument('-cp', '--checkpoint_path', type=str, default='work_dir/fl_train/pancreas_client3_correct/sam_model_client0_dice_best.pth')
-# parser.add_argument('--save_name', type=str, default='./results/ct_AMOS_pancreas_correct.py')
-
 parser.add_argument('--addname', type=str, default='_liver')
-parser.add_argument('-tdp', '--test_data_path', type=str, default='/home1/HWGroup/xrwu/Data/Proj1/ABDOMEN-dataset/ct_MSD_liver/test')
-parser.add_argument('-vp', '--vis_path', type=str, default='/home1/HWGroup/xrwu/Data/Proj1/testtime')
-parser.add_argument('-cp', '--checkpoint_path', type=str, default='work_dir/fl_train/BraTS_Client3_label2/sam_model_client1_dice_best.pth')
-parser.add_argument('--save_name', type=str, default='./results/testtime.py')
+parser.add_argument('-tdp', '--test_data_path', type=str, default='your/data/path/test')
+parser.add_argument('-vp', '--vis_path', type=str, default='your/data/save_path')
+parser.add_argument('-cp', '--checkpoint_path', type=str, default='work_dir/your_model_path/sam_model_client1_dice_best.pth')
+parser.add_argument('--save_name', type=str, default='./results/test.py')
 
-parser.add_argument('--image_size', type=int, default=256)
-parser.add_argument('--crop_size_x', type=int, default=128)
-parser.add_argument('--crop_size_y', type=int, default=128)
-parser.add_argument('--crop_size_z', type=int, default=128)
+parser.add_argument('--image_size', type=int, default=128)
 parser.add_argument('--crop_size', type=int, default=128)
-parser.add_argument('--device', type=str, default='cuda:4')
+parser.add_argument('--device', type=str, default='cuda')
 parser.add_argument('-mt', '--model_type', type=str, default='vit_b_ori')
 parser.add_argument('-nc', '--num_clicks', type=int, default=5)
 parser.add_argument('-pm', '--point_method', type=str, default='default')
@@ -51,8 +42,7 @@ parser.add_argument('--dim', type=int, default=3)
 parser.add_argument('--split_idx', type=int, default=0)
 parser.add_argument('--split_num', type=int, default=1)
 parser.add_argument('--ft2d', action='store_true', default=False)
-parser.add_argument('--seed', type=int, default=2023)
-# parser.add_argument('--img_size', type=int, default=128)
+parser.add_argument('--seed', type=int, default=111)
 
 args = parser.parse_args()
 
@@ -255,7 +245,7 @@ def finetune_model_predict3D(img3D, gt3D, sam_model_tune, device='cuda', click_m
     low_res_masks = F.interpolate(prev_masks.float(), size=(args.crop_size//4,args.crop_size//4,args.crop_size//4))
 
     with torch.no_grad():
-        image_embedding = sam_model_tune.image_encoder(img3D.to(device)) # (1, 384, 16, 16, 16)
+        image_embedding = sam_model_tune.image_encoder(img3D.to(device)) 
     for num_click in range(num_clicks):
         with torch.no_grad():
             if(num_click>1):
@@ -277,15 +267,15 @@ def finetune_model_predict3D(img3D, gt3D, sam_model_tune, device='cuda', click_m
                 masks=low_res_masks.to(device),
             )
             low_res_masks, _ = sam_model_tune.mask_decoder(
-                image_embeddings=image_embedding.to(device), # (B, 384, 64, 64, 64)
-                image_pe=sam_model_tune.prompt_encoder.get_dense_pe(), # (1, 384, 64, 64, 64)
-                sparse_prompt_embeddings=sparse_embeddings, # (B, 2, 384)
-                dense_prompt_embeddings=dense_embeddings, # (B, 384, 64, 64, 64)
+                image_embeddings=image_embedding.to(device), 
+                image_pe=sam_model_tune.prompt_encoder.get_dense_pe(), 
+                sparse_prompt_embeddings=sparse_embeddings, 
+                dense_prompt_embeddings=dense_embeddings, 
                 multimask_output=False,
                 )
             prev_masks = F.interpolate(low_res_masks, size=gt3D.shape[-3:], mode='trilinear', align_corners=False)
 
-            medsam_seg_prob = torch.sigmoid(prev_masks)  # (B, 1, 64, 64, 64)
+            medsam_seg_prob = torch.sigmoid(prev_masks)  
             # convert prob to mask
             medsam_seg_prob = medsam_seg_prob.cpu().numpy().squeeze()
             medsam_seg = (medsam_seg_prob > 0.5).astype(np.uint8)
@@ -395,8 +385,6 @@ if __name__ == "__main__":
                 subject = tio.Subject(
                         label=tio.ScalarImage(tensor=pred3D_tensor)
                         )
-                # transform_resize = tio.Resize(target_shape=(256,256,256))
-                # subject = transform_resize.apply_transform(subject)
                 transform_crop = CropOrPadWithRestore(target_shape=(args.crop_size, args.crop_size, args.crop_size))
                 restored_subject = transform_crop.restore(subject, padding_params, cropping_params)
                 restored_output = restored_subject.label.data.numpy().astype(np.uint8)
