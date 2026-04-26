@@ -98,7 +98,6 @@ class ImageEncoderViT3D(nn.Module):
             self.pos_embed = nn.Parameter(
                 torch.zeros(1, img_size // patch_size, img_size // patch_size, img_size // patch_size, embed_dim)  #
             )
-        #self.adapter_pos_embed = Adapter(embed_dim)
 
         self.blocks = nn.ModuleList()
         for i in range(depth):
@@ -138,22 +137,14 @@ class ImageEncoderViT3D(nn.Module):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # input_size = [1,1,256,256,256]
-        # import IPython; IPython.embed()
         x = self.patch_embed(x)
-        # x = [1,16,16,16,768]
-        # import pdb; pdb.set_trace()
-        """-----here-----"""
-        # self.pos_embed = self.adapter_pos_embed(self.pos_embed)
         if self.pos_embed is not None:
             x = x + self.pos_embed
 
         for blk in self.blocks:
             x = blk(x)
-        # x = [1,16,16,16,768]
         x = self.neck(x.permute(0, 4, 1, 2, 3))
 
-        # output_size = [1,256,16,16,16]
         return x
 
 
@@ -171,7 +162,7 @@ class Block3D(nn.Module):
         use_rel_pos: bool = False,
         rel_pos_zero_init: bool = True,
         window_size: int = 0,
-        input_size: Optional[Tuple[int, int, int]] = None,  #
+        input_size: Optional[Tuple[int, int, int]] = None,  
         spatial_or_not: bool =True,
     ) -> None:
         """
@@ -200,31 +191,16 @@ class Block3D(nn.Module):
             rel_pos_zero_init=rel_pos_zero_init,
             input_size=input_size if window_size == 0 else (window_size, window_size, window_size),
         )
-        """-----here----"""
+        """-----add adapter here----"""
         self.adapter1 = Adapter(dim)
         self.norm2 = norm_layer(dim)
         self.mlp = MLPBlock(embedding_dim=dim, mlp_dim=int(dim * mlp_ratio), act=act_layer)
-        """-----here----"""
+        """-----add adapter here----"""
         self.adapter2 = Adapter(dim)
 
         self.window_size = window_size
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # shortcut = x
-        # x = self.norm1(x)
-        # # Window partition
-        # if self.window_size > 0:
-        #     D, H, W = x.shape[1], x.shape[2], x.shape[3]
-        #     x, pad_dhw = window_partition3D(x, self.window_size)
-
-        # x = self.attn(x)
-        # # Reverse window partition
-        # if self.window_size > 0:
-        #     x = window_unpartition3D(x, self.window_size, pad_dhw, (D, H, W))
-
-        # x = shortcut + x
-        # x = x + self.mlp(self.norm2(x))
-
         spatial_or_not = self.spatial_or_not
         shortcut = x
         x = self.norm1(x)
@@ -233,7 +209,6 @@ class Block3D(nn.Module):
             D, H, W = x.shape[1], x.shape[2], x.shape[3]
             x, pad_dhw = window_partition3D(x, self.window_size)
 
-        # x = x + self.mlp(self.norm2(x))
         if spatial_or_not == False:  
             x = self.attn(x)
             x = self.adapter1(x)
@@ -244,7 +219,7 @@ class Block3D(nn.Module):
             x = self.norm2(x)
             x = self.mlp(x)
             x = self.adapter2(x) + shortcut2
-        else:   # 并行
+        else:   
             x_adapt = self.adapter1(x)
             x = self.attn(x) + x_adapt
             if self.window_size > 0:
