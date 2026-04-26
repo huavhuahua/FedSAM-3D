@@ -16,7 +16,7 @@ import torch.distributed as dist
 from sklearn.preprocessing import label_binarize
 from sklearn import metrics
 from utils.data_paths import img_datas, dataset_weight
-from utils.ALA import ALA
+from FL_core.ALA import ALA
 from utils.data_loader import get_dataloaders
 from utils.click_method import get_next_click3D_torch_2
 join = os.path.join
