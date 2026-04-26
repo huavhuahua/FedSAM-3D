@@ -68,10 +68,10 @@ class ALA:
             masks=low_res_masks,
         )
         low_res_masks, iou_predictions = sam_model.mask_decoder(
-            image_embeddings=image_embedding.to(self.device), # (B, 256, 64, 64)
-            image_pe=sam_model.prompt_encoder.get_dense_pe(), # (1, 256, 64, 64)
-            sparse_prompt_embeddings=sparse_embeddings, # (B, 2, 256)
-            dense_prompt_embeddings=dense_embeddings, # (B, 256, 64, 64)
+            image_embeddings=image_embedding.to(self.device), 
+            image_pe=sam_model.prompt_encoder.get_dense_pe(), 
+            sparse_prompt_embeddings=sparse_embeddings, 
+            dense_prompt_embeddings=dense_embeddings, 
             multimask_output=False,
         )
         prev_masks = F.interpolate(low_res_masks, size=gt3D.shape[-3:], mode='trilinear', align_corners=False)
