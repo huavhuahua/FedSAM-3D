@@ -66,14 +66,14 @@ class MaskDecoder(nn.Module):
 
         self.iou_prediction_head = MLP(
             transformer_dim, iou_head_hidden_dim, self.num_mask_tokens, iou_head_depth
-        )  #256 256 4 3
+        )  
 
     def forward(
         self,
-        image_embeddings: torch.Tensor,   #[B, 256, 64, 64]
-        image_pe: torch.Tensor,           #[1, 256, 64, 64]
-        sparse_prompt_embeddings: torch.Tensor, #[B, 3, 256]
-        dense_prompt_embeddings: torch.Tensor,  #[B, 256, 64, 64]
+        image_embeddings: torch.Tensor,   
+        image_pe: torch.Tensor,          
+        sparse_prompt_embeddings: torch.Tensor, 
+        dense_prompt_embeddings: torch.Tensor,  
         multimask_output: bool,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
@@ -174,8 +174,6 @@ class MLP(nn.Module):
         self.relu = nn.ReLU(inplace=False)
     def forward(self, x):
         for i, layer in enumerate(self.layers):
-            # x = F.relu(layer(x)) if i < self.num_layers - 1 else layer(x)
-            # x = self.relu(layer(x)) if i < self.num_layers - 1 else layer(x) #源码
             if i < self.num_layers - 1:
                 x = F.relu(layer(x))
             else:
